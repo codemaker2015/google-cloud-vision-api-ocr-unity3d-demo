@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Unity WebGL Player | %UNITY_WEB_NAME%</title>
+    <style>
+    /* a style sheet needs to be present for cursor hiding and custom cursors to work. */
+    </style>
+	<script>
+var gameObjectName;
+var methodNameSuccess;
+var methodNameError;
+
+function post(name, success, error, url, base64, apiType, maxResults) {
+	gameObjectName = name;
+	methodNameSuccess = success;
+	methodNameError = error;
+
+	var xhr = new XMLHttpRequest();
+	xhr.open('POST', url, true);
+	xhr.setRequestHeader('Content-Type', 'application/json');
+	xhr.onreadystatechange = function () {
+		if (xhr.readyState == 4) {
+			if (xhr.status == 200) {
+				if (gameObjectName && methodNameSuccess)
+					SendMessage(gameObjectName, methodNameSuccess, xhr.responseText);
+			} else {
+				if (gameObjectName && methodNameError)
+					SendMessage(gameObjectName, methodNameError, xhr.responseText);
+			}
+		} else {
+			console.log("xhr.status: " + xhr.status);
+		}
+	};
+
+	var params = {
+		requests: [
+			{
+				image: {
+					content: base64
+				},
+				features: [
+					{
+						type: apiType,
+						maxResults: maxResults
+					}
+				]
+			}
+		]
+	};
+
+	xhr.send(JSON.stringify(params));
+}
+	</script>
+  </head>
+  <body>
+    <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" height="%UNITY_HEIGHT%px" width="%UNITY_WIDTH%px"></canvas>
+    %UNITY_WEBGL_LOADER_GLUE%
+  </body>
+</html>
